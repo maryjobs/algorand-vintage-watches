@@ -26,7 +26,7 @@ export const watchNote = "vintage_watch_market:uv1"
 export const numLocalInts = 0;
 export const numLocalBytes = 0;
 // Maximum global storage allocation, immutable
-export const numGlobalInts = 1; // Global variables stored as Int: count, sold
-export const numGlobalBytes = 3; // Global variables stored as Bytes: name, description, image
+export const numGlobalInts = 2; // Global variables stored as Int: price, sale
+export const numGlobalBytes = 4; // Global variables stored as Bytes: name, description, image, owner
 
 export const ALGORAND_DECIMALS = 6;
