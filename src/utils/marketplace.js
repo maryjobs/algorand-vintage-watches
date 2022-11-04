@@ -36,7 +36,7 @@ const compileProgram = async (programSource) => {
 
 // CREATE WATCH LISTING: ApplicationCreateTxn
 export const createWatchAction = async (senderAddress, watch) => {
-    console.log("Adding watch to dapp...")
+    
 
     let params = await algodClient.getTransactionParams().do();
 
@@ -73,26 +73,24 @@ export const createWatchAction = async (senderAddress, watch) => {
 
     // Sign & submit the transaction
     let signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
-    console.log("Signed transaction with txID: %s", txId);
+    
     await algodClient.sendRawTransaction(signedTxn.blob).do();
 
     // Wait for transaction to be confirmed
     let confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
 
-    // Get the completed Transaction
-    console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
-
+    
     // Get created application id and notify about completion
     let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
     let appId = transactionResponse['application-index'];
-    console.log("Created new app-id: ", appId);
+    
     return appId;
 }
 
 
 // CHANGE IMAGE: Group transaction consisting of ApplicationCallTxn 
 export const changeImageAction = async (senderAddress, watch, image) => {
-    console.log("changing image...");
+    
   
     let params = await algodClient.getTransactionParams().do();
   
@@ -121,7 +119,7 @@ export const changeImageAction = async (senderAddress, watch, image) => {
     let signedTxn = await myAlgoConnect.signTransaction(
       txnArray.map((txn) => txn.toByte())
     );
-    console.log("Signed group transaction");
+    
     let tx = await algodClient
       .sendRawTransaction(signedTxn.map((txn) => txn.blob))
       .do();
@@ -129,20 +127,15 @@ export const changeImageAction = async (senderAddress, watch, image) => {
     // Wait for group transaction to be confirmed
     let confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
   
-    // Notify about completion
-    console.log(
-      "Group transaction " +
-        tx.txId +
-        " confirmed in round " +
-        confirmedTxn["confirmed-round"]
-    );
+
+    
   };
   
 
   
 // CHANGE DESCRIPTION: Group transaction consisting of ApplicationCallTxn 
 export const changeDescriptionAction = async (senderAddress, watch, description) => {
-    console.log("changing description...");
+    
   
     let params = await algodClient.getTransactionParams().do();
   
@@ -171,7 +164,7 @@ export const changeDescriptionAction = async (senderAddress, watch, description)
     let signedTxn = await myAlgoConnect.signTransaction(
       txnArray.map((txn) => txn.toByte())
     );
-    console.log("Signed group transaction");
+    
     let tx = await algodClient
       .sendRawTransaction(signedTxn.map((txn) => txn.blob))
       .do();
@@ -179,19 +172,14 @@ export const changeDescriptionAction = async (senderAddress, watch, description)
     // Wait for group transaction to be confirmed
     let confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
   
-    // Notify about completion
-    console.log(
-      "Group transaction " +
-        tx.txId +
-        " confirmed in round " +
-        confirmedTxn["confirmed-round"]
-    );
+   
+    
   };
 
 
 // BUY PRODUCT: Group transaction consisting of ApplicationCallTxn and PaymentTxn
 export const buyWatchAction = async (senderAddress, watch) => {
-    console.log("Buying watch...");
+    
 
     let params = await algodClient.getTransactionParams().do();
 
@@ -224,19 +212,18 @@ export const buyWatchAction = async (senderAddress, watch) => {
 
     // Sign & submit the group transaction
     let signedTxn = await myAlgoConnect.signTransaction(txnArray.map(txn => txn.toByte()));
-    console.log("Signed group transaction");
+    
     let tx = await algodClient.sendRawTransaction(signedTxn.map(txn => txn.blob)).do();
 
     // Wait for group transaction to be confirmed
     let confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
 
-    // Notify about completion
-    console.log("Group transaction " + tx.txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+  
 }
 
 // DELETE PRODUCT: ApplicationDeleteTxn
 export const deleteWatchAction = async (senderAddress, index) => {
-    console.log("Deleting application...");
+    
 
     let params = await algodClient.getTransactionParams().do();
 
@@ -250,24 +237,22 @@ export const deleteWatchAction = async (senderAddress, index) => {
 
     // Sign & submit the transaction
     let signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
-    console.log("Signed transaction with txID: %s", txId);
+    
     await algodClient.sendRawTransaction(signedTxn.blob).do();
 
     // Wait for transaction to be confirmed
     const confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
 
-    // Get the completed Transaction
-    console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
-
+    
     // Get application id of deleted application and notify about completion
     let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
     let appId = transactionResponse['txn']['txn'].apid;
-    console.log("Deleted app-id: ", appId);
+    
 }
 
 // GET PRODUCTS: Use indexer
 export const getWatchesAction = async () => {
-    console.log("Fetching watches...")
+    
     let note = new TextEncoder().encode(watchNote);
     let encodedNote = Buffer.from(note).toString("base64");
 
@@ -288,7 +273,6 @@ export const getWatchesAction = async () => {
             }
         }
     }
-    console.log("Watches fetched.")
     return watches
 }
 
