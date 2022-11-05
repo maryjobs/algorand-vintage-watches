@@ -2,40 +2,71 @@
 txn ApplicationID
 int 0
 ==
-bnz main_l12
+bnz main_l17
 txn OnCompletion
 int DeleteApplication
 ==
-bnz main_l11
+bnz main_l16
 txna ApplicationArgs 0
 byte "buy"
 ==
-bnz main_l8
+bnz main_l13
 txna ApplicationArgs 0
 byte "changeimage"
 ==
-bnz main_l7
+bnz main_l12
 txna ApplicationArgs 0
 byte "changedescription"
 ==
-bnz main_l6
+bnz main_l11
+txna ApplicationArgs 0
+byte "toggleSale"
+==
+bnz main_l7
 err
-main_l6:
-byte "DESCRIPTION"
-txna ApplicationArgs 2
-app_global_put
-int 1
-return
 main_l7:
-byte "IMAGE"
-txna ApplicationArgs 2
+txn Sender
+byte "OWNER"
+app_global_get
+==
+assert
+byte "FORSALE"
+app_global_get
+int 0
+==
+bnz main_l10
+byte "FORSALE"
+int 0
+app_global_put
+main_l9:
+int 1
+return
+main_l10:
+byte "FORSALE"
+int 1
+app_global_put
+b main_l9
+main_l11:
+byte "DESCRIPTION"
+txna ApplicationArgs 1
 app_global_put
 int 1
 return
-main_l8:
+main_l12:
+byte "IMAGE"
+txna ApplicationArgs 1
+app_global_put
+int 1
+return
+main_l13:
 global GroupSize
 int 2
 ==
+byte "FORSALE"
+app_global_get
+int 1
+==
+&&
 gtxn 1 TypeEnum
 int pay
 ==
@@ -54,27 +85,27 @@ gtxn 0 Sender
 ==
 &&
 &&
-bnz main_l10
+bnz main_l15
 int 0
 return
-main_l10:
-byte "OWNER"
-txn Sender
+main_l15:
+byte "FORSALE"
+int 0
 app_global_put
 int 1
 return
-main_l11:
+main_l16:
 txn Sender
 byte "OWNER"
 app_global_get
 ==
 return
-main_l12:
+main_l17:
 txn NumAppArgs
 int 4
 ==
 txn Note
-byte "vintage_watch_market:uv1"
+byte "watch_marketplace:uv3"
 ==
 &&
 txna ApplicationArgs 0
@@ -113,6 +144,9 @@ btoi
 app_global_put
 byte "OWNER"
 txn Sender
+app_global_put
+byte "FORSALE"
+int 1
 app_global_put
 int 1
 return

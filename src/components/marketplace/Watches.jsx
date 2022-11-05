@@ -4,9 +4,10 @@ import AddWatch from "./AddWatch";
 import Watch from "./Watch";
 import Loader from "../utils/Loader";
 import {NotificationError, NotificationSuccess} from "../utils/Notifications";
-import {buyWatchAction, createWatchAction, changeDescriptionAction, changeImageAction, deleteWatchAction, getWatchesAction,} from "../../utils/marketplace";
+import {buyWatchAction, createWatchAction, changeDescriptionAction, changeImageAction, deleteWatchAction, getWatchesAction, toggleSaleAction,} from "../../utils/marketplace";
 import PropTypes from "prop-types";
 import {Row} from "react-bootstrap";
+
 
 const Watches = ({address, fetchBalance}) => {
     const [watches, setWatches] = useState([]);
@@ -62,6 +63,23 @@ const Watches = ({address, fetchBalance}) => {
                 setLoading(false);
             })
     };
+
+
+    const toggleSale = async (watch) => {
+        setLoading(true);
+        toggleSaleAction(address, watch)
+            .then(() => {
+                toast(<NotificationSuccess text="toggled successfully"/>);
+                getWatches();
+                fetchBalance(address);
+            })
+            .catch(error => {
+                console.log(error)
+                toast(<NotificationError text="toggle failed"/>);
+                setLoading(false);
+            })
+    };
+
 
     const changeImage = async (watch, image) => {
         setLoading(true);
@@ -126,6 +144,7 @@ const Watches = ({address, fetchBalance}) => {
                             buyWatch={buyWatch}
                             changeDescription = {changeDescription}
                             changeImage = {changeImage}
+                            toggleSale ={toggleSale}
                             deleteWatch={deleteWatch}
                             key={index}
                         />
