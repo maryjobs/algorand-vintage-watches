@@ -5,4 +5,4 @@ its a vintage marketplace where users can buy and sell old vintage original watc
 # Live demo app:
 
 
-https://dreamy-croquembouche-6869a1.netlify.app
+https://snazzy-druid-ffbd14.netlify.app
