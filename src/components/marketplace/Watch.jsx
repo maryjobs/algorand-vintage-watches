@@ -1,12 +1,12 @@
 import React, {useState} from "react";
 import PropTypes from "prop-types";
-import {Badge, Button, Card, Col, FloatingLabel, Form, Stack} from "react-bootstrap";
+import {Button, Card, Col, FloatingLabel, Form, Stack} from "react-bootstrap";
 import {microAlgosToString, truncateAddress} from "../../utils/conversions";
 import Identicon from "../utils/Identicon";
-import {stringToMicroAlgos} from "../../utils/conversions";
 
-const Watch = ({address, watch, buyWatch, deleteWatch, changeImage, changeDescription}) => {
-    const {name, image, description, price, appId, owner} = watch;
+
+const Watch = ({address, watch, buyWatch, deleteWatch, changeImage, toggleSale, changeDescription}) => {
+    const {name, image, description, price, forSale, appId, owner} = watch;
 
     const [newimage, setNewImage] = useState("")
     const [newdescription, setNewDescription] = useState("")
@@ -29,7 +29,7 @@ const Watch = ({address, watch, buyWatch, deleteWatch, changeImage, changeDescri
                     <Card.Text className="flex-grow-1">{description}</Card.Text>
                     <Form className="d-flex align-content-stretch flex-row gap-2">
                        
-                        {watch.owner !== address &&
+                        {watch.owner !== address && forSale === 1 &&
                         <Button
                             variant="outline-dark"
                             onClick={() => buyWatch(watch)}
@@ -54,14 +54,14 @@ const Watch = ({address, watch, buyWatch, deleteWatch, changeImage, changeDescri
              {watch.owner === address &&
              <Form>
                  <FloatingLabel
-                            controlId="inputUrl"
-                            label="Image URL"
-                            className="mb-3"
+                            controlId="inputImg"
+                            label="new Image URL"
+                            className="mb-3 mt-4"
                         >
                             <Form.Control
                                 type="text"
-                                placeholder="Image URL"
-                                value={image}
+                                placeholder="new Image URL"
+                                
                                 onChange={(e) => {
                                     setNewImage(e.target.value);
                                 }}
@@ -83,7 +83,7 @@ const Watch = ({address, watch, buyWatch, deleteWatch, changeImage, changeDescri
                   <FloatingLabel
                             controlId="inputDescription"
                             label="Description"
-                            className="mb-3"
+                            className="mb-3 mt-4"
                         >
                             <Form.Control
                                 as="textarea"
@@ -104,6 +104,16 @@ const Watch = ({address, watch, buyWatch, deleteWatch, changeImage, changeDescri
                             </Form>
                         }
 
+                             { watch.owner === address &&
+                             <Button
+                                variant="primary mt-2"
+                                onClick={() => toggleSale(watch)}
+                                className="btn"
+                            >
+                               {forSale === 1 ? "Toggle not for sale" : "Toggle for sale"}
+                            </Button>
+                           }
+
 
            
 
@@ -123,6 +133,7 @@ Watch.propTypes = {
     buyWatch: PropTypes.func.isRequired,
     changeDescription: PropTypes.func.isRequired,
    changeImage: PropTypes.func.isRequired,
+   toggleSale: PropTypes.func.isRequired,
     deleteWatch: PropTypes.func.isRequired
 };
 

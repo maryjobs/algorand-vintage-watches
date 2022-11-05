@@ -16,13 +16,15 @@ import clearProgram from "!!raw-loader!../contracts/vintage_marketplace_contract
 import {base64ToUTF8String, utf8ToBase64String} from "./conversions";
 
 class Watch {
-    constructor(name, image, description, price,  appId, owner) {
+    constructor(name, image, description, price, forSale, appId, owner) {
         this.name = name;
         this.image = image;
         this.description = description;
         this.price = price;
-        this.appId = appId;
         this.owner = owner;
+        this.forSale = forSale;
+        this.appId = appId;
+       
     }
 }
 
@@ -140,6 +142,59 @@ export const changeImageAction = async (senderAddress, watch, image) => {
   
 
   
+// TOGGLE SALE: Group transaction consisting of ApplicationCallTxn 
+export const toggleSaleAction = async (senderAddress, watch) => {
+    console.log("changing forsale ...");
+  
+    let params = await algodClient.getTransactionParams().do();
+  
+    // Build required app args as Uint8Array
+    let toggleSaleArg = new TextEncoder().encode("toggleSale");
+  
+    let appArgs = [toggleSaleArg];
+  
+    // Create ApplicationCallTxn
+    let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
+      from: senderAddress,
+      appIndex: watch.appId,
+      onComplete: algosdk.OnApplicationComplete.NoOpOC,
+      suggestedParams: params,
+      appArgs: appArgs,
+    });
+  
+    let txnArray = [appCallTxn];
+  
+    // Create group transaction out of previously build transactions
+    let groupID = algosdk.computeGroupID(txnArray);
+    for (let i = 0; i < 1; i++) txnArray[i].group = groupID;
+  
+    // Sign & submit the group transaction
+    let signedTxn = await myAlgoConnect.signTransaction(
+      txnArray.map((txn) => txn.toByte())
+    );
+    console.log("Signed group transaction");
+    let tx = await algodClient
+      .sendRawTransaction(signedTxn.map((txn) => txn.blob))
+      .do();
+  
+    // Wait for group transaction to be confirmed
+    let confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
+  
+    // Notify about completion
+    console.log(
+      "Group transaction " +
+        tx.txId +
+        " confirmed in round " +
+        confirmedTxn["confirmed-round"]
+    );
+  };
+  
+
+  
+
+
+
+
 // CHANGE DESCRIPTION: Group transaction consisting of ApplicationCallTxn 
 export const changeDescriptionAction = async (senderAddress, watch, description) => {
     console.log("changing description...");
@@ -147,10 +202,10 @@ export const changeDescriptionAction = async (senderAddress, watch, description)
     let params = await algodClient.getTransactionParams().do();
   
     // Build required app args as Uint8Array
-    let changedescriptionArg = new TextEncoder().encode("changedescription");
+    let changeDescriptionArg = new TextEncoder().encode("changedescription");
     let newdescription = new TextEncoder().encode(description);
   
-    let appArgs = [changeDescriptionAction, newdescription];
+    let appArgs = [changeDescriptionArg, newdescription];
   
     // Create ApplicationCallTxn
     let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
@@ -308,6 +363,7 @@ const getApplication = async (appId) => {
         let image = ""
         let description = ""
         let price = 0
+        let forSale = 1
 
         const getField = (fieldName, globalState) => {
             return globalState.find(state => {
@@ -334,9 +390,13 @@ const getApplication = async (appId) => {
             price = getField("PRICE", globalState).value.uint
         }
 
+        if (getField("FORSALE", globalState) !== undefined) {
+            forSale = getField("FORSALE", globalState).value.uint
+        }
+
       
 
-        return new Watch(name, image, description, price, appId, owner)
+        return new Watch(name, image, description, price, forSale, appId, owner)
     } catch (err) {
         return null;
     }
